@@ -1,33 +1,33 @@
 package progjar;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.DataInputStream;
-import java.net.ServerSocket;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.net.Socket;
 
 public class StreamTest {
 	public static void main(String[] args) {
 		try {			
-			ServerSocket server = new ServerSocket(6666);
-			Socket client = server.accept();
-			
-//			BufferedInputStream bis = new BufferedInputStream(client.getInputStream());
-//			BufferedOutputStream bos = new BufferedOutputStream(client.getOutputStream());
+			Socket socket = new Socket("my.its.ac.id", 443);
+			BufferedReader br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+			BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
 
-			DataInputStream bis = new DataInputStream(client.getInputStream());
-			DataOutputStream bos = new DataOutputStream(client.getOutputStream());
-			
-//			String buf = new String(bis.readAllBytes());
-			String buf = new String(bis.readLine());
-			bos.write(buf.getBytes());
-			
-			client.close();
-			server.close();
+			String msg = "GET / HTTP/1.1\r\nHost: my.its.ac.id\r\n\r\n";
+			bw.write(msg);
+			bw.flush();
+
+			String resp = br.readLine();
+			while (resp != null) {
+			// while (!resp.equalsIgnoreCase("")) {
+				System.out.println(resp);
+				resp = br.readLine();
+			}
+			br.close();
+			bw.close();
+			socket.close();
 		} catch (Exception e) {
-			// TODO: handle exception
-//			Logger.getLogger(StreamTest.class);
-			System.out.println(e);
+			e.printStackTrace();
 		}
 	}
 
